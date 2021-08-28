@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:crypto_app/model/my_assets.dart';
 import 'package:flutter/material.dart';
 
 class MainPage extends StatefulWidget {
@@ -9,6 +12,16 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   ValueNotifier<int> _tabIndex = ValueNotifier(0);
+
+  late MyAsset _myAsset;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _myAsset = MyAsset.fromJson(jsonDecode(kCryptoMyAsset));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,9 +52,8 @@ class _MainPageState extends State<MainPage> {
                         ),
                       ],
                     ),
-
                     Text(
-                      '\$ 23,874.45',
+                      '\$ ${_myAsset.balance}',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -71,7 +83,7 @@ class _MainPageState extends State<MainPage> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8),
                           child: Text(
-                            '+ 6.78% ',
+                            '+ ${_myAsset.thisWeek}% ',
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.green,
@@ -120,13 +132,89 @@ class _MainPageState extends State<MainPage> {
                     Expanded(
                       child: ListView.builder(
                           scrollDirection: Axis.horizontal,
+                          itemCount: _myAsset.myAssets!.length,
                           itemBuilder: (context, index) {
                             return Padding(
                               padding: const EdgeInsets.only(right: 8),
                               child: Container(
                                 width: 150,
                                 decoration: BoxDecoration(
-                                  color: Colors.blue,
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                padding: EdgeInsets.all(8),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 12,
+                                        ),
+                                        SizedBox(
+                                          width: 8,
+                                        ),
+                                        Text(
+                                          '${_myAsset.myAssets?[index].coin}',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 4,),
+                                    Text('${_myAsset.myAssets?[index].unit}'),
+                                    Text(
+                                      'USD ${_myAsset.myAssets?[index].price}',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(height: 4,),
+                                    Row(
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 8,
+                                          backgroundColor: _myAsset
+                                                      .myAssets?[index]
+                                                      .change
+                                                      ?.upDown ==
+                                                  'up'
+                                              ? Colors.green
+                                              : Colors.red,
+                                          foregroundColor: Colors.white,
+                                          child: _myAsset.myAssets?[index]
+                                                      .change?.upDown ==
+                                                  'up'
+                                              ? Icon(
+                                                  Icons.arrow_upward,
+                                                  size: 8,
+                                                )
+                                              : Icon(
+                                                  Icons.arrow_downward,
+                                                  size: 8,
+                                                ),
+                                        ),
+                                        SizedBox(
+                                          width: 8,
+                                        ),
+                                        Text(
+                                          '${_myAsset.myAssets?[index].change?.upDown == 'up' ? '+' : '-'}'
+                                          '${_myAsset.myAssets?[index].change?.rate}%',
+                                          style: TextStyle(
+                                            color: _myAsset.myAssets?[index]
+                                                        .change?.upDown ==
+                                                    'up'
+                                                ? Colors.green
+                                                : Colors.red,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
                               ),
                             );
